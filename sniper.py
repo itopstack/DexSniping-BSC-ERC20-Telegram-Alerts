@@ -10,6 +10,9 @@ from time import sleep
 from halo import Halo
 from style import style
 
+sys.stdin.reconfigure(encoding='utf-8')
+sys.stdout.reconfigure(encoding='utf-8')
+
 ascii = """
 ________                   _________      .__                     
 \______ \   ____ ___  ___ /   _____/ ____ |__|_____   ___________ 
