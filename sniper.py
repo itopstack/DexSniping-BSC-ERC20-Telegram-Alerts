@@ -29,9 +29,9 @@ ________                   _________      .__
 
 spinneroptions = {'interval': 250, 'frames': ['🚀 ', '🌙 ', '🚀 ', '🌕 ', '💸 ']}
 parser = argparse.ArgumentParser(
-    description='Set your Token and Amount example: "sniper.py -t 0xaAA9c55FF5ce8e6431d84BE3cf9d0Ba39742ac52 -a 0.2 -s 15"')
+    description='Set your Token and Amount example: "sniper.py -t 0xfAf383E0b3fa3dBE62ce54B285860cBD8E4a0C8f -a 0.2 -s 15"')
 parser.add_argument(
-    '-t', '--token', help='str, Token for snipe e.g. "-t 0xaAA9c55FF5ce8e6431d84BE3cf9d0Ba39742ac52"')
+    '-t', '--token', help='str, Token for snipe e.g. "-t 0xfAf383E0b3fa3dBE62ce54B285860cBD8E4a0C8f"')
 parser.add_argument('-a', '--amount', default=0,
                     help='float, Amount in Bnb to snipe e.g. "-a 0.1"')
 parser.add_argument('-tx', '--txamount', default=1, nargs="?", const=1, type=int,
@@ -47,7 +47,7 @@ parser.add_argument('-sl', '--stoploss', default=0, nargs="?", const=True, type=
 parser.add_argument('-tsl', '--trailingstoploss', default=0, nargs="?", const=True,
                     type=int, help='int, Percentage Trailing-Stop-loss from your first Quote "-tsl 50" ')
 parser.add_argument('-wb', '--awaitBlocks', default=0, nargs="?", const=True,
-                    type=int, help='int, Await Blocks before sending BUY Transaction "-ab 50" ')
+                    type=int, help='int, Await Blocks before sending BUY Transaction "-wb 50" ')
 parser.add_argument('-so', '--sellonly',  action="store_true",
                     help='Sell all your Tokens from given address')
 parser.add_argument('-bo', '--buyonly',  action="store_true",
@@ -103,7 +103,7 @@ class SniperBot():
         self.token = args.token
         if self.token == None:
             print(
-                style.RED+"Please Check your Token argument e.g. -t 0xaAA9c55FF5ce8e6431d84BE3cf9d0Ba39742ac52")
+                style.RED+"Please Check your Token argument e.g. -t 0xfAf383E0b3fa3dBE62ce54B285860cBD8E4a0C8f")
             print("exit!")
             sys.exit()
         self.amount = args.amount
@@ -134,12 +134,12 @@ class SniperBot():
 
     def calcloss(self):
         a = ((self.amountForSnipe * self.tx) * self.sl) / 100
-        b = (self.amountForSnipe * self.tx) - a
+        b = (self.amountForSnipe * self.tx) - a #7
         return b
 
     def calcNewTrailingStop(self, currentPrice):
         a = (currentPrice * self.tsl) / 100
-        b = currentPrice - a
+        b = currentPrice - a #8
         return b
 
     def awaitBuy(self):
@@ -208,7 +208,7 @@ class SniperBot():
         while True:
             sleep(0.07)
             try:
-                if self.TXN.checkifTokenBuyDisabled() == True:
+                if self.TXN.checkifTokenBuyDisabled() == True: #9
                     spinner.stop()
                     break
             except Exception as e:
@@ -230,21 +230,21 @@ class SniperBot():
                     TrailingStopLoss = self.calcNewTrailingStop(LastPrice)
                 if LastPrice < TrailingStopLoss:
                     print(style().GREEN +
-                          "[TRAILING STOP LOSS] Triggert!" + style().RESET)
+                          "[TRAILING STOP LOSS] Trigger!" + style().RESET)
                     self.awaitSell()
                     break
             if self.takeProfitOutput != 0:
                 if LastPrice >= self.takeProfitOutput:
                     print()
                     print(style().GREEN +
-                          "[TAKE PROFIT] Triggert!" + style().RESET)
+                          "[TAKE PROFIT] Trigger!" + style().RESET)
                     self.awaitSell()
                     break
             if self.stoploss != 0:
                 if LastPrice <= self.stoploss:
                     print()
                     print(style().GREEN +
-                          "[STOP LOSS] Triggert!" + style().RESET)
+                          "[STOP LOSS] Trigger!" + style().RESET)
                     self.awaitSell()
                     break
 

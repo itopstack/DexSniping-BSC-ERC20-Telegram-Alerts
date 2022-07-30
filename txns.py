@@ -54,9 +54,15 @@ class TXN():
     def getBlockHigh(self):
         return self.w3.eth.block_number
 
-    def setup_swapper(self):
+    def setup_swapper(self): #1
+        with open("./Settings.json") as f:
+            keys = json.load(f)
+        if len(keys["metamask_address"]) <= 41:
+            print(style.RED + "Set your Address in the keys.json file!" + style.RESET)
+            sys.exit()
+
         swapper_address = Web3.toChecksumAddress(
-            "0xaAA9c55FF5ce8e6431d84BE3cf9d0Ba39742ac52")
+            keys["metamask_address"])
         with open("./abis/BSC_Swapper.json") as f:
             contract_abi = json.load(f)
         swapper = self.w3.eth.contract(
@@ -133,7 +139,7 @@ class TXN():
             self.slippage
         ).buildTransaction(
             {'from': self.address,
-             'gas': 480000,
+             'gas': 480000, #2
              'gasPrice': self.gas_price,
              'nonce': self.w3.eth.getTransactionCount(self.address),
              'value': int(self.quantity)}
@@ -165,10 +171,10 @@ class TXN():
         if self.is_approve() == False:
             txn = self.token_contract.functions.approve(
                 self.swapper_address,
-                115792089237316195423570985008687907853269984665640564039457584007913129639935  # Max Approve
+                115792089237316195423570985008687907853269984665640564039457584007913129639935  # Max Approve #3
             ).buildTransaction(
                 {'from': self.address,
-                 'gas': 100000,
+                 'gas': 100000, #4
                  'gasPrice': self.gas_price,
                  'nonce': self.w3.eth.getTransactionCount(self.address),
                  'value': 0}
@@ -186,7 +192,7 @@ class TXN():
             else:
                 return False, style.RED + "\nApprove Transaction Faild!" + style.RESET
         else:
-            return True, style.GREEN + "\nAllready approved!" + style.RESET
+            return True, style.GREEN + "\nAlready approved!" + style.RESET
 
     def sell_tokens(self):
         self.approve()
@@ -194,14 +200,14 @@ class TXN():
             self.address,
             self.token_address,
             # Only a test, because some users have TransferFrom error, but i think its comes from Slippage.
-            int(self.token_contract.functions.balanceOf(self.address).call() - 1),
+            int(self.token_contract.functions.balanceOf(self.address).call() - 1), #5
             self.slippage
         ).buildTransaction(
             {'from': self.address,
              'gas': 550000,
              'gasPrice': self.gas_price,
              'nonce': self.w3.eth.getTransactionCount(self.address),
-             'value': 0}
+             'value': 0} #6
         )
         txn.update({'gas': int(self.estimateGas(txn))})
         signed_txn = self.w3.eth.account.sign_transaction(
